@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,7 +19,7 @@ public class ObjectiveController {
     OwnedObjectiveService ownedObjectiveService;
 
     @GetMapping
-    public Iterable<Objective> getAllObjectives(@RequestParam boolean rollup, Principal principal) {
+    public List<Objective> getAllObjectives(@RequestParam(required = false) boolean rollup, Principal principal) {
         return ownedObjectiveService.findAll(principal.getName(), rollup);
     }
 

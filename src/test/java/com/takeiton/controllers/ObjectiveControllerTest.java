@@ -65,13 +65,17 @@ public class ObjectiveControllerTest {
 
     @Test
     public void getAllObjectives_success() throws Exception {
-        List<Objective> objectives = new ArrayList<>(Arrays.asList(OBJ_1, OBJ_2, OBJ_3));
+        List<Objective> objectives = new ArrayList<Objective>();
+        objectives.add(OBJ_1);
+        objectives.add(OBJ_2);
+        objectives.add(OBJ_3);
         Mockito.when(objectiveService.findAll("user_1", true)).thenReturn(objectives);
-
         mockMvc.perform(MockMvcRequestBuilders
-                        .get(baseUrl)
+                        .get(baseUrl + "?rollup=true")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token))
+                        .header("Authorization", "Bearer " + token)
+                        .accept(MediaType.APPLICATION_JSON))
+//                .andDo(MockMvcResultHandlers.print());
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
     }
@@ -95,6 +99,7 @@ public class ObjectiveControllerTest {
                         .get(baseUrl + "/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$.name", is("obj_1")));

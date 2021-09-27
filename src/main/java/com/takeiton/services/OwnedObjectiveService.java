@@ -35,7 +35,7 @@ public class OwnedObjectiveService {
         return objectiveRepository.save(objective);
     }
 
-    public Iterable<Objective> findAll(String ownerName, boolean rollup) {
+    public List<Objective> findAll(String ownerName, boolean rollup) {
         AppUser appUser = appUserRepository.findById(ownerName).get();
 
         List<Objective> objectiveList = objectiveRepository.findAllByOwner(appUser);
