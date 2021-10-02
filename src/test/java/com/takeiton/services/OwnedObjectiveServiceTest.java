@@ -35,6 +35,16 @@ public class OwnedObjectiveServiceTest {
     Objective OWNED_OBJECTIVE = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("Name").owner(user).build();
     Objective UNOWNED_OBJECTIVE = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("Name").build();
 
+    Objective OWNED_OBJECTIVE_1 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_1").owner(user).build();
+    Objective OWNED_OBJECTIVE_2 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_2").owner(user).build();
+    Objective OWNED_OBJECTIVE_3 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_3").owner(user).build();
+
+    List<Objective> objectives = new ArrayList<>(Arrays.asList(OWNED_OBJECTIVE_1, OWNED_OBJECTIVE_2, OWNED_OBJECTIVE_3));
+
+
+
+
+
     @Test
     public void createObjectiveTest_happy_case() {
         Mockito.when(objectiveRepository.save(UNOWNED_OBJECTIVE)).thenReturn(UNOWNED_OBJECTIVE);
@@ -188,6 +198,164 @@ public class OwnedObjectiveServiceTest {
         assertEquals(0.33, foundObjective.getTaskStatusAggregates().getNotstartedAggregate());
         assertEquals(0.33, foundObjective.getTaskStatusAggregates().getDoneAggregate());
         assertEquals(0.33, foundObjective.getTaskStatusAggregates().getInprogressAggregate());
+    }
+
+    @Test
+    public void findAllTest_WithTasks() {
+
+        Task task_1 = Task.builder().status(Status.NOT_STARTED.toString()).build();
+        Task task_2 = Task.builder().status(Status.IN_PROGRESS.toString()).build();
+        Task task_3 = Task.builder().status(Status.IN_PROGRESS.toString()).build();
+        Task task_4 = Task.builder().status(Status.IN_PROGRESS.toString()).build();
+        Task task_5 = Task.builder().status(Status.COMPLETED.toString()).build();
+        Task task_6 = Task.builder().status(Status.COMPLETED.toString()).build();
+
+        List<Task> tasks = Arrays.asList(task_1, task_2, task_3, task_4, task_5, task_6);
+
+
+        Objective OWNED_OBJECTIVE_1 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_1").owner(user).build();
+        OWNED_OBJECTIVE_1.setTasks(tasks);
+        Objective OWNED_OBJECTIVE_2 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_2").owner(user).build();
+        Objective OWNED_OBJECTIVE_3 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_3").owner(user).build();
+
+        List<Objective> objectives = new ArrayList<>(Arrays.asList(OWNED_OBJECTIVE_1, OWNED_OBJECTIVE_2, OWNED_OBJECTIVE_3));
+
+        Mockito.when(appUserRepository.findById(name)).thenReturn(java.util.Optional.ofNullable(user));
+        Mockito.when(objectiveRepository.findAllByOwner(user)).thenReturn(objectives);
+
+        List<Objective> retrievedObjectives = objectiveService.findAll(user.getUsername(), true);
+
+        assertEquals(3, retrievedObjectives.size());
+
+        Optional<Objective> optOwnedObj_1 = retrievedObjectives.stream().filter(objective -> "OWNED_OBJECTIVE_1".equals(objective.getName())).findFirst();
+        assertTrue(optOwnedObj_1.isPresent());
+
+        Objective ownedObjective = optOwnedObj_1.get();
+        assertEquals(6, ownedObjective.getTasks().size());
+
+        assertEquals(0.17, ownedObjective.getTaskStatusAggregates().getNotstartedAggregate());
+        assertEquals(0.5, ownedObjective.getTaskStatusAggregates().getInprogressAggregate());
+        assertEquals(0.33, ownedObjective.getTaskStatusAggregates().getDoneAggregate());
+
+    }
+
+    @Test
+    public void findAllTest_WithTasksOtherObjectives() {
+
+        Task task_1 = Task.builder().status(Status.NOT_STARTED.toString()).build();
+        Task task_2 = Task.builder().status(Status.IN_PROGRESS.toString()).build();
+        Task task_3 = Task.builder().status(Status.IN_PROGRESS.toString()).build();
+        Task task_4 = Task.builder().status(Status.IN_PROGRESS.toString()).build();
+        Task task_5 = Task.builder().status(Status.COMPLETED.toString()).build();
+        Task task_6 = Task.builder().status(Status.COMPLETED.toString()).build();
+
+        List<Task> tasks = Arrays.asList(task_1, task_2, task_3, task_4, task_5, task_6);
+
+
+        Objective OWNED_OBJECTIVE_1 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_1").owner(user).build();
+        OWNED_OBJECTIVE_1.setTasks(tasks);
+        Objective OWNED_OBJECTIVE_2 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_2").owner(user).build();
+        Objective OWNED_OBJECTIVE_3 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_3").owner(user).build();
+
+        List<Objective> objectives = new ArrayList<>(Arrays.asList(OWNED_OBJECTIVE_1, OWNED_OBJECTIVE_2, OWNED_OBJECTIVE_3));
+
+        Mockito.when(appUserRepository.findById(name)).thenReturn(java.util.Optional.ofNullable(user));
+        Mockito.when(objectiveRepository.findAllByOwner(user)).thenReturn(objectives);
+
+        List<Objective> retrievedObjectives = objectiveService.findAll(user.getUsername(), true);
+
+        assertEquals(3, retrievedObjectives.size());
+
+        Optional<Objective> optOwnedObj_1 = retrievedObjectives.stream().filter(objective -> "OWNED_OBJECTIVE_2".equals(objective.getName())).findFirst();
+        assertTrue(optOwnedObj_1.isPresent());
+
+        Objective ownedObjective = optOwnedObj_1.get();
+        assertNull(ownedObjective.getTasks());
+
+        assertEquals(0.0, ownedObjective.getTaskStatusAggregates().getNotstartedAggregate());
+        assertEquals(0.0, ownedObjective.getTaskStatusAggregates().getInprogressAggregate());
+        assertEquals(0.0, ownedObjective.getTaskStatusAggregates().getDoneAggregate());
+
+    }
+
+
+    @Test
+    public void findAllTest_WithMilestones() {
+
+        Milestone milestone_1 = Milestone.builder().status(Status.NOT_STARTED.toString()).build();
+        Milestone milestone_2 = Milestone.builder().status(Status.IN_PROGRESS.toString()).build();
+        Milestone milestone_3 = Milestone.builder().status(Status.IN_PROGRESS.toString()).build();
+        Milestone milestone_4 = Milestone.builder().status(Status.IN_PROGRESS.toString()).build();
+        Milestone milestone_5 = Milestone.builder().status(Status.COMPLETED.toString()).build();
+        Milestone milestone_6 = Milestone.builder().status(Status.COMPLETED.toString()).build();
+
+        List<Milestone> milestones = Arrays.asList(milestone_1, milestone_2, milestone_3, milestone_4, milestone_5, milestone_6);
+
+
+        Objective OWNED_OBJECTIVE_1 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_1").owner(user).build();
+        OWNED_OBJECTIVE_1.setMilestones(milestones);
+        Objective OWNED_OBJECTIVE_2 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_2").owner(user).build();
+        Objective OWNED_OBJECTIVE_3 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_3").owner(user).build();
+
+        List<Objective> objectives = new ArrayList<>(Arrays.asList(OWNED_OBJECTIVE_1, OWNED_OBJECTIVE_2, OWNED_OBJECTIVE_3));
+
+        Mockito.when(appUserRepository.findById(name)).thenReturn(java.util.Optional.ofNullable(user));
+        Mockito.when(objectiveRepository.findAllByOwner(user)).thenReturn(objectives);
+
+        List<Objective> retrievedObjectives = objectiveService.findAll(user.getUsername(), true);
+
+        assertEquals(3, retrievedObjectives.size());
+
+        Optional<Objective> optOwnedObj_1 = retrievedObjectives.stream().filter(objective -> "OWNED_OBJECTIVE_1".equals(objective.getName())).findFirst();
+        assertTrue(optOwnedObj_1.isPresent());
+
+        Objective ownedObjective = optOwnedObj_1.get();
+        assertEquals(6, ownedObjective.getMilestones().size());
+
+        assertEquals(0.17, ownedObjective.getMilestoneStatusAggregates().getNotstartedAggregate());
+        assertEquals(0.5, ownedObjective.getMilestoneStatusAggregates().getInprogressAggregate());
+        assertEquals(0.33, ownedObjective.getMilestoneStatusAggregates().getDoneAggregate());
+
+    }
+
+
+    @Test
+    public void findAllTest_WithMilestonesOtherObjectives() {
+
+        Milestone milestone_1 = Milestone.builder().status(Status.NOT_STARTED.toString()).build();
+        Milestone milestone_2 = Milestone.builder().status(Status.IN_PROGRESS.toString()).build();
+        Milestone milestone_3 = Milestone.builder().status(Status.IN_PROGRESS.toString()).build();
+        Milestone milestone_4 = Milestone.builder().status(Status.IN_PROGRESS.toString()).build();
+        Milestone milestone_5 = Milestone.builder().status(Status.COMPLETED.toString()).build();
+        Milestone milestone_6 = Milestone.builder().status(Status.COMPLETED.toString()).build();
+
+        List<Milestone> milestones = Arrays.asList(milestone_1, milestone_2, milestone_3, milestone_4, milestone_5, milestone_6);
+
+
+        Objective OWNED_OBJECTIVE_1 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_1").owner(user).build();
+        OWNED_OBJECTIVE_1.setMilestones(milestones);
+        Objective OWNED_OBJECTIVE_2 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_2").owner(user).build();
+        Objective OWNED_OBJECTIVE_3 = Objective.builder().doneCriteria("Done_criteria").dueDate(new Date()).description("Description").name("OWNED_OBJECTIVE_3").owner(user).build();
+
+        List<Objective> objectives = new ArrayList<>(Arrays.asList(OWNED_OBJECTIVE_1, OWNED_OBJECTIVE_2, OWNED_OBJECTIVE_3));
+
+        Mockito.when(appUserRepository.findById(name)).thenReturn(java.util.Optional.ofNullable(user));
+        Mockito.when(objectiveRepository.findAllByOwner(user)).thenReturn(objectives);
+
+        List<Objective> retrievedObjectives = objectiveService.findAll(user.getUsername(), true);
+
+        assertEquals(3, retrievedObjectives.size());
+
+        Optional<Objective> optOwnedObj_1 = retrievedObjectives.stream().filter(objective -> "OWNED_OBJECTIVE_2".equals(objective.getName())).findFirst();
+        assertTrue(optOwnedObj_1.isPresent());
+
+        Objective ownedObjective = optOwnedObj_1.get();
+        assertNull(ownedObjective.getMilestones());
+
+        assertEquals(0.0, ownedObjective.getMilestoneStatusAggregates().getNotstartedAggregate());
+        assertEquals(0.0, ownedObjective.getMilestoneStatusAggregates().getInprogressAggregate());
+        assertEquals(0.0, ownedObjective.getMilestoneStatusAggregates().getDoneAggregate());
+
     }
 
 }

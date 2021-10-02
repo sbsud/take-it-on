@@ -70,7 +70,7 @@ public class OwnedObjectiveService {
     private StatusAggregate getMilestoneStatusAggregate(Objective objective) {
         List<Milestone> milestones = objective.getMilestones();
         if (milestones == null || milestones.isEmpty()) {
-            return null;
+            return new StatusAggregate();
         }
         double doneCount = milestones.stream().filter(MILESTONE_BY_DONE_STATUS).count();
         double inProgressCount = milestones.stream().filter(MILESTONE_BY_INPROGRESS_STATUS).count();
@@ -97,7 +97,7 @@ public class OwnedObjectiveService {
     private StatusAggregate getTaskStatusAggregate(Objective objective) {
         List<Task> tasks = objective.getTasks();
         if (tasks == null || tasks.isEmpty()) {
-            return null;
+            return new StatusAggregate();
         }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
         double inProgressCount = tasks.stream().filter(TASK_BY_INPROGRESS_STATUS).count();

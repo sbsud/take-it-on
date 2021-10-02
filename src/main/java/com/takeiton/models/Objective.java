@@ -52,11 +52,11 @@ public class Objective {
 
     @Transient
     @JsonInclude
-    private StatusAggregate milestoneStatusAggregates;
+    private StatusAggregate milestoneStatusAggregates = new StatusAggregate();
 
     @Transient
     @JsonInclude
-    private StatusAggregate taskStatusAggregates;
+    private StatusAggregate taskStatusAggregates = new StatusAggregate();
 
     private String status;
 }

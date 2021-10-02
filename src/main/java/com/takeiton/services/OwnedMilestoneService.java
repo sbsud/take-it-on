@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -39,6 +40,9 @@ public class OwnedMilestoneService {
 
         Objective objective = objectiveByIdAndOwner.get();
         List<Milestone> objMilestones = objective.getMilestones();
+        if (objMilestones ==  null) {
+            objMilestones = new ArrayList<Milestone>();
+        }
         objMilestones.add(createdMilestone);
         objective.setMilestones(objMilestones);
         objectiveRepository.save(objective);
