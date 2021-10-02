@@ -4,6 +4,7 @@ import com.takeiton.models.*;
 import com.takeiton.repositories.AppUserRepository;
 import com.takeiton.repositories.ObjectiveRepository;
 import com.takeiton.util.Status;
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,17 @@ public class OwnedObjectiveService {
     ObjectiveRepository objectiveRepository;
 
     public Objective createObjective(Objective objective, String username) {
-        AppUser appUser = appUserRepository.findById(username).get();
+        if (objective == null) {
+            throw new IllegalArgumentException("Objective is null");
+        }
+        Optional<AppUser> optAppUser = appUserRepository.findById(username);
+        AppUser appUser;
+        if (optAppUser.isPresent()) {
+            appUser = optAppUser.get();
+        } else {
+            throw new IllegalArgumentException("Invalid username");
+        }
+
         objective.setOwner(appUser);
         objective.setStatus(Status.NOT_STARTED.toString());
         return objectiveRepository.save(objective);
@@ -58,7 +69,7 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getMilestoneStatusAggregate(Objective objective) {
         List<Milestone> milestones = objective.getMilestones();
-        if (milestones.isEmpty()) {
+        if (milestones == null || milestones.isEmpty()) {
             return null;
         }
         double doneCount = milestones.stream().filter(MILESTONE_BY_DONE_STATUS).count();
@@ -69,9 +80,9 @@ public class OwnedObjectiveService {
         double inProgressAggregate = inProgressCount / size;
         double notStartedAggregate = notStartedCount / size;
         StatusAggregate statusAggregate = StatusAggregate.builder()
-                .doneAggregate(doneAggregate)
-                .inprogressAggregate(inProgressAggregate)
-                .notstartedAggregate(notStartedAggregate)
+                .doneAggregate(Precision.round(doneAggregate,2))
+                .inprogressAggregate(Precision.round(inProgressAggregate,2))
+                .notstartedAggregate(Precision.round(notStartedAggregate,2))
                 .build();
         return statusAggregate;
     }
@@ -85,7 +96,7 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getTaskStatusAggregate(Objective objective) {
         List<Task> tasks = objective.getTasks();
-        if (tasks.isEmpty()) {
+        if (tasks == null || tasks.isEmpty()) {
             return null;
         }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
@@ -96,9 +107,9 @@ public class OwnedObjectiveService {
         double inProgressAggregate = inProgressCount / size;
         double notStartedAggregate = notStartedCount / size;
         StatusAggregate statusAggregate = StatusAggregate.builder()
-                .doneAggregate(doneAggregate)
-                .inprogressAggregate(inProgressAggregate)
-                .notstartedAggregate(notStartedAggregate)
+                .doneAggregate(Precision.round(doneAggregate,2))
+                .inprogressAggregate(Precision.round(inProgressAggregate,2))
+                .notstartedAggregate(Precision.round(notStartedAggregate,2))
                 .build();
         return statusAggregate;
     }

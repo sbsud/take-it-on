@@ -1,5 +1,6 @@
 package com.takeiton.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.takeiton.models.AppUser;
 import com.takeiton.models.Objective;
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import java.util.*;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -75,7 +77,6 @@ public class ObjectiveControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token)
                         .accept(MediaType.APPLICATION_JSON))
-//                .andDo(MockMvcResultHandlers.print());
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)));
     }
@@ -106,7 +107,7 @@ public class ObjectiveControllerTest {
     }
 
     @Test
-    public void createObjective() throws Exception {
+    public void createObjective_happyCase() throws Exception {
         Objective OBJ_Create = Objective.builder()
                 .id(1L)
                 .name("OBJ_Create")
@@ -129,6 +130,23 @@ public class ObjectiveControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$.name", is("OBJ_Create")))
                 .andExpect(jsonPath("$.description", is("OBJ_create_desc")));
+    }
+
+    @Test
+    public void createObjectiveTest_null() throws Exception {
+        Objective nullObjective = null;
+
+        Mockito.when(objectiveService.createObjective(nullObjective, "dummyname")).thenThrow(IllegalArgumentException.class);
+
+        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post(baseUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(nullObjective));
+
+
+        mockMvc.perform(mockRequest)
+                        .andExpect(status().isBadRequest());
     }
 
 
