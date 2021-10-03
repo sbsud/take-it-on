@@ -5,6 +5,7 @@ import com.takeiton.repositories.AppUserRepository;
 import com.takeiton.repositories.MilestoneRepository;
 import com.takeiton.repositories.ObjectiveRepository;
 import com.takeiton.util.Status;
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class OwnedMilestoneService {
     public static final Predicate<Task> TASK_BY_NOTSTARTED_STATUS = task -> Status.NOT_STARTED.toString().equalsIgnoreCase(task.getStatus());
 
     public Milestone createMilestone(Long objectiveId, Milestone milestone, String ownerName) {
+        if(milestone == null) {
+            throw new IllegalArgumentException("Null Milestone");
+        }
         AppUser appUser = appUserRepository.findById(ownerName).get();
         Optional<Objective> objectiveByIdAndOwner = objectiveRepository.findByIdAndOwner(objectiveId, appUser);
         if (objectiveByIdAndOwner.isEmpty()) {
@@ -77,8 +81,8 @@ public class OwnedMilestoneService {
 
     private StatusAggregate getTaskStatusAggregate(Milestone milestone) {
         List<Task> tasks = milestone.getTasks();
-        if (tasks.isEmpty()) {
-            return null;
+        if (tasks == null || tasks.isEmpty()) {
+            return new StatusAggregate();
         }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
         double inProgressCount = tasks.stream().filter(TASK_BY_INPROGRESS_STATUS).count();
@@ -88,9 +92,9 @@ public class OwnedMilestoneService {
         double inProgressAggregate = inProgressCount / size;
         double notStartedAggregate = notStartedCount / size;
         StatusAggregate statusAggregate = StatusAggregate.builder()
-                .doneAggregate(doneAggregate)
-                .inprogressAggregate(inProgressAggregate)
-                .notstartedAggregate(notStartedAggregate)
+                .doneAggregate(Precision.round(doneAggregate,2))
+                .inprogressAggregate(Precision.round(inProgressAggregate,2))
+                .notstartedAggregate(Precision.round(notStartedAggregate,2))
                 .build();
         return statusAggregate;
     }
