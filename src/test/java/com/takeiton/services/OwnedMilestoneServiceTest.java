@@ -220,7 +220,7 @@ public class OwnedMilestoneServiceTest {
         assertTrue(optOwnedMilestone.isPresent());
 
         Milestone ownedMilestone = optOwnedMilestone.get();
-        assertNull(ownedMilestone.getTasks());
+        assertTrue(ownedMilestone.getTasks().isEmpty());
 
         assertEquals(0.0, ownedMilestone.getTaskStatusAggregates().getNotstartedAggregate());
         assertEquals(0.0, ownedMilestone.getTaskStatusAggregates().getInprogressAggregate());

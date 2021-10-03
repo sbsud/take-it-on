@@ -11,9 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class StatusAggregate {
 
+    @Builder.Default
     private double doneAggregate = 0.0;
 
+    @Builder.Default
     private double inprogressAggregate = 0.0;
 
+    @Builder.Default
     private double notstartedAggregate = 0.0;
 }

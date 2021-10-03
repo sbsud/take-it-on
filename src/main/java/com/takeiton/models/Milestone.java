@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,11 +42,13 @@ public class Milestone {
 
     @OneToMany
     @JsonIgnore
-    private List<Task> tasks;
+    @Builder.Default
+    private List<Task> tasks = new ArrayList<>();
 
     @Transient
     @JsonInclude
-    private StatusAggregate taskStatusAggregates;
+    @Builder.Default
+    private StatusAggregate taskStatusAggregates = new StatusAggregate();
 
     private String status;
 }

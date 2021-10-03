@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,19 +45,23 @@ public class Objective {
 
     @OneToMany
     @JsonIgnore
-    private List<Milestone> milestones;
+    @Builder.Default
+    private List<Milestone> milestones = new ArrayList<>();
 
     @OneToMany
     @JsonIgnore
-    private List<Task> tasks;
+    @Builder.Default
+    private List<Task> tasks = new ArrayList<>();
 
     @Transient
     @JsonInclude
-    private StatusAggregate milestoneStatusAggregates = new StatusAggregate();
+    @Builder.Default
+    private StatusAggregate milestoneStatusAggregates = StatusAggregate.builder().build();
 
     @Transient
     @JsonInclude
-    private StatusAggregate taskStatusAggregates = new StatusAggregate();
+    @Builder.Default
+    private StatusAggregate taskStatusAggregates = StatusAggregate.builder().build();
 
     private String status;
 }

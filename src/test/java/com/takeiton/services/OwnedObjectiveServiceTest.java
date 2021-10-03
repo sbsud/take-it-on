@@ -270,7 +270,7 @@ public class OwnedObjectiveServiceTest {
         assertTrue(optOwnedObj_1.isPresent());
 
         Objective ownedObjective = optOwnedObj_1.get();
-        assertNull(ownedObjective.getTasks());
+        assertTrue(ownedObjective.getTasks().isEmpty());
 
         assertEquals(0.0, ownedObjective.getTaskStatusAggregates().getNotstartedAggregate());
         assertEquals(0.0, ownedObjective.getTaskStatusAggregates().getInprogressAggregate());
@@ -350,7 +350,7 @@ public class OwnedObjectiveServiceTest {
         assertTrue(optOwnedObj_1.isPresent());
 
         Objective ownedObjective = optOwnedObj_1.get();
-        assertNull(ownedObjective.getMilestones());
+        assertTrue(ownedObjective.getMilestones().isEmpty());
 
         assertEquals(0.0, ownedObjective.getMilestoneStatusAggregates().getNotstartedAggregate());
         assertEquals(0.0, ownedObjective.getMilestoneStatusAggregates().getInprogressAggregate());

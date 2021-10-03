@@ -4,12 +4,12 @@ import com.takeiton.models.AppUser;
 import com.takeiton.models.Milestone;
 import com.takeiton.models.Objective;
 import com.takeiton.models.Task;
-import com.takeiton.repositories.AppUserRepository;
 import com.takeiton.repositories.MilestoneRepository;
 import com.takeiton.repositories.ObjectiveRepository;
 import com.takeiton.repositories.TaskRepository;
 import com.takeiton.util.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,11 +28,17 @@ public class OwnedTaskService {
     TaskRepository taskRepository;
 
     @Autowired
-    AppUserRepository appUserRepository;
+    UserService userService;
 
 
     public Task createTaskForObjective(Long objectiveId, Task task, String ownerName) {
-        AppUser appUser = appUserRepository.findById(ownerName).get();
+        if (task == null) {
+            throw new IllegalArgumentException("Null Task");
+        }
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
         Task createdTask = createTaskWithProperties(task, appUser);
         Objective objective = objectiveRepository.findByIdAndOwner(objectiveId, appUser).get();
         List<Task> taskList = objective.getTasks();
@@ -43,7 +49,13 @@ public class OwnedTaskService {
     }
 
     public Task createTaskForMilestone(Long milestoneId, Task task, String ownerName) {
-        AppUser appUser = appUserRepository.findById(ownerName).get();
+        if (task == null) {
+            throw new IllegalArgumentException("Null Task");
+        }
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
         Task createdTask = createTaskWithProperties(task, appUser);
         Milestone milestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser).get();
         List<Task> taskList = milestone.getTasks();
@@ -60,7 +72,10 @@ public class OwnedTaskService {
     }
 
     public Optional<Task> findById(Long taskId, String ownerName) {
-        AppUser appUser = appUserRepository.findById(ownerName).get();
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
         Optional<Task> optionalTask = taskRepository.findByIdAndOwner(taskId, appUser);
         if (optionalTask.isPresent()) {
             Task task = optionalTask.get();
@@ -70,7 +85,13 @@ public class OwnedTaskService {
     }
 
     public Optional<Task> save(Long taskId, Task task, String ownerName) {
-        AppUser appUser = appUserRepository.findById(ownerName).get();
+        if (task == null) {
+            throw new IllegalArgumentException("Invalid Task");
+        }
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
         Optional<Task> retrievedOptionalTask = taskRepository.findByIdAndOwner(taskId, appUser);
 
         if (retrievedOptionalTask.isPresent()) {
@@ -86,14 +107,20 @@ public class OwnedTaskService {
     }
 
     public Iterable<Task> findAllTasks(String ownerName) {
-        AppUser appUser = appUserRepository.findById(ownerName).get();
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
         return taskRepository.findAllByOwner(appUser);
     }
 
     public Optional<List<Task>> findTasksForMilestone(Long milestoneId, String ownerName) {
-        AppUser appUser = appUserRepository.findById(ownerName).get();
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
         Optional<Milestone> optionalMilestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser);
-        if(optionalMilestone.isEmpty()) {
+        if (optionalMilestone.isEmpty()) {
             return Optional.empty();
         }
         List tasks = optionalMilestone.get().getTasks();

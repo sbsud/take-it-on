@@ -69,21 +69,19 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getMilestoneStatusAggregate(Objective objective) {
         List<Milestone> milestones = objective.getMilestones();
-        if (milestones == null || milestones.isEmpty()) {
-            return new StatusAggregate();
-        }
         double doneCount = milestones.stream().filter(MILESTONE_BY_DONE_STATUS).count();
         double inProgressCount = milestones.stream().filter(MILESTONE_BY_INPROGRESS_STATUS).count();
         double notStartedCount = milestones.stream().filter(MILESTONE_BY_NOTSTARTED_STATUS).count();
+        StatusAggregate statusAggregate = StatusAggregate.builder().build();
         int size = milestones.size();
-        double doneAggregate = doneCount / size;
-        double inProgressAggregate = inProgressCount / size;
-        double notStartedAggregate = notStartedCount / size;
-        StatusAggregate statusAggregate = StatusAggregate.builder()
-                .doneAggregate(Precision.round(doneAggregate,2))
-                .inprogressAggregate(Precision.round(inProgressAggregate,2))
-                .notstartedAggregate(Precision.round(notStartedAggregate,2))
-                .build();
+        if (size > 0) {
+            double doneAggregate = doneCount / size;
+            double inProgressAggregate = inProgressCount / size;
+            double notStartedAggregate = notStartedCount / size;
+            statusAggregate.setDoneAggregate(Precision.round(doneAggregate, 2));
+            statusAggregate.setInprogressAggregate(Precision.round(inProgressAggregate, 2));
+            statusAggregate.setNotstartedAggregate(Precision.round(notStartedAggregate, 2));
+        }
         return statusAggregate;
     }
 
@@ -96,21 +94,19 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getTaskStatusAggregate(Objective objective) {
         List<Task> tasks = objective.getTasks();
-        if (tasks == null || tasks.isEmpty()) {
-            return new StatusAggregate();
-        }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
         double inProgressCount = tasks.stream().filter(TASK_BY_INPROGRESS_STATUS).count();
         double notStartedCount = tasks.stream().filter(TASK_BY_NOTSTARTED_STATUS).count();
         long size = tasks.size();
-        double doneAggregate = doneCount / size;
-        double inProgressAggregate = inProgressCount / size;
-        double notStartedAggregate = notStartedCount / size;
-        StatusAggregate statusAggregate = StatusAggregate.builder()
-                .doneAggregate(Precision.round(doneAggregate,2))
-                .inprogressAggregate(Precision.round(inProgressAggregate,2))
-                .notstartedAggregate(Precision.round(notStartedAggregate,2))
-                .build();
+        StatusAggregate statusAggregate = StatusAggregate.builder().build();
+        if (size > 0 ) {
+            double doneAggregate = doneCount / size;
+            double inProgressAggregate = inProgressCount / size;
+            double notStartedAggregate = notStartedCount / size;
+            statusAggregate.setDoneAggregate(Precision.round(doneAggregate, 2));
+            statusAggregate.setInprogressAggregate(Precision.round(inProgressAggregate, 2));
+            statusAggregate.setNotstartedAggregate(Precision.round(notStartedAggregate, 2));
+        }
         return statusAggregate;
     }
 }
