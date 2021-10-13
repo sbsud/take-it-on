@@ -31,13 +31,18 @@ public class MilestoneController {
     }
 
     @GetMapping(value = "/milestone/{milestoneId}")
-    public ResponseEntity<Milestone> getObjective(@PathVariable(value = "milestoneId") Long milestoneId, Principal principal) {
+    public ResponseEntity<Milestone> getMilestone(@PathVariable(value = "milestoneId") Long milestoneId, Principal principal) {
         Optional<Milestone> milestone = milestoneService.findById(milestoneId, principal.getName());
         return milestone.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping(value = "/objective/{objectiveId}/milestone")
-    public Iterable<Milestone> getAllMilestones(@RequestParam boolean rollup, Principal principal) {
-        return milestoneService.findAll(principal.getName(), rollup);
+    @GetMapping(value = "/milestone")
+    public Iterable<Milestone> getAllMilestones(Principal principal) {
+        return milestoneService.findAll(principal.getName());
+    }
+
+    @GetMapping(value = "objective/{objectiveId}/milestone")
+    public Iterable<Milestone> getAllMilestones(@PathVariable Long objectiveId, Principal principal) {
+        return milestoneService.findMilestonesForObjective(objectiveId, principal.getName());
     }
 }

@@ -170,7 +170,7 @@ public class OwnedMilestoneServiceTest {
         Mockito.when(appUserRepository.findById(name)).thenReturn(java.util.Optional.ofNullable(user));
         Mockito.when(milestoneRepository.findAllByOwner(user)).thenReturn(milestones);
 
-        Iterable<Milestone> retrievedMilestonesItr = milestoneService.findAll(user.getUsername(), true);
+        Iterable<Milestone> retrievedMilestonesItr = milestoneService.findAll(user.getUsername());
         List<Milestone> retrievedMilestones = new ArrayList<>();
         retrievedMilestonesItr.forEach(retrievedMilestones::add);
         assertEquals(3, retrievedMilestones.size());
@@ -210,7 +210,7 @@ public class OwnedMilestoneServiceTest {
         Mockito.when(appUserRepository.findById(name)).thenReturn(java.util.Optional.ofNullable(user));
         Mockito.when(milestoneRepository.findAllByOwner(user)).thenReturn(milestones);
 
-        Iterable<Milestone> retrievedMilestonesItr = milestoneService.findAll(user.getUsername(), true);
+        Iterable<Milestone> retrievedMilestonesItr = milestoneService.findAll(user.getUsername());
         List<Milestone> retrievedMilestones = new ArrayList<>();
         retrievedMilestonesItr.forEach(retrievedMilestones::add);
 

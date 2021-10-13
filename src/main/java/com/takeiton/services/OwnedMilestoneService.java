@@ -51,7 +51,7 @@ public class OwnedMilestoneService {
         return createdMilestone;
     }
 
-    public Iterable<Milestone> findAll(String ownerName, boolean rollup) {
+    public Iterable<Milestone> findAll(String ownerName) {
         AppUser appUser = appUserRepository.findById(ownerName).get();
 
         List<Milestone> milestoneList = milestoneRepository.findAllByOwner(appUser);
@@ -96,4 +96,20 @@ public class OwnedMilestoneService {
     }
 
 
+    public Iterable<Milestone> findMilestonesForObjective(Long objectiveId, String ownerName) {
+        AppUser appUser = appUserRepository.findById(ownerName).get();
+        Optional<Objective> objectiveByIdAndOwner = objectiveRepository.findByIdAndOwner(objectiveId, appUser);
+        if (objectiveByIdAndOwner.isEmpty()) {
+            throw new AccessDeniedException("Objective not found");
+        }
+        Objective objective = objectiveByIdAndOwner.get();
+        List<Milestone> objMilestones = objective.getMilestones();
+        if (objMilestones == null) {
+            objMilestones = new ArrayList<Milestone>();
+        }
+        for (Milestone milestone : objMilestones) {
+            updateAggregates(milestone);
+        }
+        return objMilestones;
+    }
 }
