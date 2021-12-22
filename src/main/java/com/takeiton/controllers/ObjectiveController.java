@@ -34,4 +34,10 @@ public class ObjectiveController {
         return ownedObjectiveService.createObjective(objective, principal.getName());
     }
 
+    @PutMapping(value = "{objectiveId}")
+    public ResponseEntity<Objective> updateObjective(@PathVariable(value = "objectiveId") Long objectiveId, @RequestBody @Valid Objective objective, Principal principal){
+        Optional<Objective> savedObjective = ownedObjectiveService.save(objectiveId, objective, principal.getName());
+        return savedObjective.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

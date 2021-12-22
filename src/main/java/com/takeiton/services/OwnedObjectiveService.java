@@ -109,4 +109,31 @@ public class OwnedObjectiveService {
         }
         return statusAggregate;
     }
+
+
+    public Optional<Objective> save(Long objectiveId, Objective objective, String ownerName) {
+        if (objective == null) {
+            throw new IllegalArgumentException("Invalid objective");
+        }
+        Optional<AppUser> optAppUser = appUserRepository.findById(ownerName);
+        AppUser appUser;
+        if (optAppUser.isPresent()) {
+            appUser = optAppUser.get();
+        } else {
+            throw new IllegalArgumentException("Invalid username");
+        }
+        Optional<Objective> retrievedOptionalObjective = objectiveRepository.findByIdAndOwner(objectiveId, appUser);
+
+        if (retrievedOptionalObjective.isPresent()) {
+            Objective retrievedObjective = retrievedOptionalObjective.get();
+            retrievedObjective.setStatus(objective.getStatus());
+            retrievedObjective.setDescription(objective.getDescription());
+            retrievedObjective.setDueDate(objective.getDueDate());
+            retrievedObjective.setDoneCriteria(objective.getDoneCriteria());
+            retrievedObjective.setName(objective.getName());
+            objectiveRepository.save(retrievedObjective);
+            return Optional.of(retrievedObjective);
+        }
+        return Optional.empty();
+    }
 }
