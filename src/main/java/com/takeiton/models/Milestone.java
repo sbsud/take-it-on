@@ -27,6 +27,8 @@ public class Milestone {
     @JsonInclude
     private final String type = getClass().getSimpleName();
 
+    private String clientId;
+
     private String name;
 
     private String description;
@@ -34,6 +36,10 @@ public class Milestone {
     private String doneCriteria;
 
     private Date dueDate;
+
+    private String parentId;
+
+    private String parentType;
 
     @OneToOne
     @NotNull

@@ -123,7 +123,18 @@ public class OwnedTaskService {
         if (optionalMilestone.isEmpty()) {
             return Optional.empty();
         }
-        List tasks = optionalMilestone.get().getTasks();
+        Milestone milestone = optionalMilestone.get();
+        List<Task> tasks = milestone.getTasks();
+        for (Task task : tasks) {
+            updateParentAttributes(task, milestone);
+        }
         return Optional.of(tasks);
+    }
+
+    private void updateParentAttributes(Task task, Milestone milestone) {
+        String milClientId = "mil_" + milestone.getId();
+        task.setClientId(milClientId + "\\tas_" + task.getId());
+        task.setParentId(milClientId);
+        task.setParentType(Milestone.class.getSimpleName());
     }
 }

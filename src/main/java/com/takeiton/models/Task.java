@@ -33,6 +33,9 @@ public class Task {
 
     private Date dueDate;
 
+    private String parentId;
+    private String clientId;
+    private String parentType;
     @OneToOne
     @NotNull
     @JsonIgnore

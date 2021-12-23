@@ -24,6 +24,8 @@ public class Objective {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String clientId;
+
     @Transient
     @JsonInclude
     private final String type = getClass().getSimpleName();
@@ -34,6 +36,8 @@ public class Objective {
     private String description;
 
     private String doneCriteria;
+
+    private Long parentId;
 
     @NotNull
     private Date dueDate;

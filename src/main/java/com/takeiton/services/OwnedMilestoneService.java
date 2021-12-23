@@ -108,8 +108,22 @@ public class OwnedMilestoneService {
             objMilestones = new ArrayList<Milestone>();
         }
         for (Milestone milestone : objMilestones) {
+            updateParentAttributes(milestone, objective);
             updateAggregates(milestone);
         }
         return objMilestones;
+    }
+
+    private void updateParentAttributes(Milestone milestone, Objective objective) {
+//        String template = "%s\\%s";
+//        String parentId = String.join("\\", Long.toString(objectiveId), Long.toString(milestone.getId()));//template.replace("parent", Long.toString(objectiveId));
+//        parentId = parentId.replace("child", Long.toString(milestone.getId()));
+////        char backslash = '\';
+//        parentId = String.format(parentId,"");
+        String objClientId = "obj_" + objective.getId();
+        milestone.setClientId(objClientId + "\\mil_" + milestone.getId());
+        milestone.setParentId(objClientId);
+        milestone.setParentType(Objective.class.getSimpleName());
+
     }
 }
