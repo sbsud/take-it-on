@@ -43,6 +43,8 @@ public class OwnedObjectiveService {
 
         objective.setOwner(appUser);
         objective.setStatus(Status.NOT_STARTED.toString());
+        objective =objectiveRepository.save(objective);
+        objective.setClientId(Objective.class.getSimpleName()+"_"+objective.getId());
         return objectiveRepository.save(objective);
     }
 
@@ -52,13 +54,8 @@ public class OwnedObjectiveService {
         List<Objective> objectiveList = objectiveRepository.findAllByOwner(appUser);
         for (Objective objective : objectiveList) {
             updateAggregates(objective);
-            updateClientId(objective);
         }
         return objectiveList;
-    }
-
-    private void updateClientId(Objective objective) {
-        objective.setClientId("obj_"+Long.toString(objective.getId()));
     }
 
     public Optional<Objective> findById(Long objectiveId, String ownerName) {

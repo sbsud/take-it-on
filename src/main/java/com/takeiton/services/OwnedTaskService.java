@@ -39,8 +39,11 @@ public class OwnedTaskService {
         if (appUser == null) {
             throw new AccessDeniedException("Invalid user");
         }
-        Task createdTask = createTaskWithProperties(task, appUser);
         Objective objective = objectiveRepository.findByIdAndOwner(objectiveId, appUser).get();
+        task.setParentId(objective.getClientId());
+        Task createdTask = createTaskWithProperties(task, appUser);
+        createdTask.setClientId(objective.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
+        createdTask = createTaskWithProperties(createdTask, appUser);
         List<Task> taskList = objective.getTasks();
         taskList.add(createdTask);
         objective.setTasks(taskList);
@@ -56,8 +59,12 @@ public class OwnedTaskService {
         if (appUser == null) {
             throw new AccessDeniedException("Invalid user");
         }
-        Task createdTask = createTaskWithProperties(task, appUser);
+
         Milestone milestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser).get();
+        task.setParentId(milestone.getClientId());
+        Task createdTask = createTaskWithProperties(task, appUser);
+        createdTask.setClientId(milestone.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
+        createdTask = createTaskWithProperties(createdTask, appUser);
         List<Task> taskList = milestone.getTasks();
         taskList.add(createdTask);
         milestone.setTasks(taskList);
@@ -125,16 +132,7 @@ public class OwnedTaskService {
         }
         Milestone milestone = optionalMilestone.get();
         List<Task> tasks = milestone.getTasks();
-        for (Task task : tasks) {
-            updateParentAttributes(task, milestone);
-        }
         return Optional.of(tasks);
     }
 
-    private void updateParentAttributes(Task task, Milestone milestone) {
-        String milClientId = "mil_" + milestone.getId();
-        task.setClientId(milClientId + "\\tas_" + task.getId());
-        task.setParentId(milClientId);
-        task.setParentType(Milestone.class.getSimpleName());
-    }
 }

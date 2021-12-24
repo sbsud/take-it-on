@@ -38,9 +38,13 @@ public class OwnedMilestoneService {
         }
         milestone.setOwner(appUser);
         milestone.setStatus(Status.NOT_STARTED.toString());
-        Milestone createdMilestone = milestoneRepository.save(milestone);
+
 
         Objective objective = objectiveByIdAndOwner.get();
+
+        milestone.setParentId(objective.getClientId());
+        Milestone createdMilestone = milestoneRepository.save(milestone);
+
         List<Milestone> objMilestones = objective.getMilestones();
         if (objMilestones == null) {
             objMilestones = new ArrayList<Milestone>();
@@ -48,6 +52,8 @@ public class OwnedMilestoneService {
         objMilestones.add(createdMilestone);
         objective.setMilestones(objMilestones);
         objectiveRepository.save(objective);
+        createdMilestone.setClientId(objective.getClientId() + "\\" + Milestone.class.getSimpleName() + "_" + createdMilestone.getId());
+        createdMilestone = milestoneRepository.save(createdMilestone);
         return createdMilestone;
     }
 
@@ -108,22 +114,8 @@ public class OwnedMilestoneService {
             objMilestones = new ArrayList<Milestone>();
         }
         for (Milestone milestone : objMilestones) {
-            updateParentAttributes(milestone, objective);
             updateAggregates(milestone);
         }
         return objMilestones;
-    }
-
-    private void updateParentAttributes(Milestone milestone, Objective objective) {
-//        String template = "%s\\%s";
-//        String parentId = String.join("\\", Long.toString(objectiveId), Long.toString(milestone.getId()));//template.replace("parent", Long.toString(objectiveId));
-//        parentId = parentId.replace("child", Long.toString(milestone.getId()));
-////        char backslash = '\';
-//        parentId = String.format(parentId,"");
-        String objClientId = "obj_" + objective.getId();
-        milestone.setClientId(objClientId + "\\mil_" + milestone.getId());
-        milestone.setParentId(objClientId);
-        milestone.setParentType(Objective.class.getSimpleName());
-
     }
 }
