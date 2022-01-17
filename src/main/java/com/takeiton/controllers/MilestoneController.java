@@ -45,4 +45,10 @@ public class MilestoneController {
     public Iterable<Milestone> getAllMilestones(@PathVariable Long objectiveId, Principal principal) {
         return milestoneService.findMilestonesForObjective(objectiveId, principal.getName());
     }
+
+    @PutMapping(value = "milestone/{milestoneId}")
+    public ResponseEntity<Milestone> updateMilestone(@PathVariable(value = "milestoneId") Long milestoneId, @RequestBody @Valid Milestone milestone, Principal principal){
+        Optional<Milestone> savedMilestone = milestoneService.save(milestoneId, milestone, principal.getName());
+        return savedMilestone.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

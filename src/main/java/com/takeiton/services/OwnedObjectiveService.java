@@ -54,6 +54,9 @@ public class OwnedObjectiveService {
         List<Objective> objectiveList = objectiveRepository.findAllByOwner(appUser);
         for (Objective objective : objectiveList) {
             updateAggregates(objective);
+            if (objective.getMilestoneStatusAggregates() ==  null && objective.getTaskStatusAggregates() == null) {
+                objective.hasItems = false;
+            }
         }
         return objectiveList;
     }
@@ -71,6 +74,9 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getMilestoneStatusAggregate(Objective objective) {
         List<Milestone> milestones = objective.getMilestones();
+        if(milestones.isEmpty()) {
+            return null;
+        }
         double doneCount = milestones.stream().filter(MILESTONE_BY_DONE_STATUS).count();
         double inProgressCount = milestones.stream().filter(MILESTONE_BY_INPROGRESS_STATUS).count();
         double notStartedCount = milestones.stream().filter(MILESTONE_BY_NOTSTARTED_STATUS).count();
@@ -96,6 +102,9 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getTaskStatusAggregate(Objective objective) {
         List<Task> tasks = objective.getTasks();
+        if(tasks.isEmpty()) {
+            return null;
+        }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
         double inProgressCount = tasks.stream().filter(TASK_BY_INPROGRESS_STATUS).count();
         double notStartedCount = tasks.stream().filter(TASK_BY_NOTSTARTED_STATUS).count();
@@ -128,11 +137,13 @@ public class OwnedObjectiveService {
 
         if (retrievedOptionalObjective.isPresent()) {
             Objective retrievedObjective = retrievedOptionalObjective.get();
-            retrievedObjective.setStatus(objective.getStatus());
-            retrievedObjective.setDescription(objective.getDescription());
-            retrievedObjective.setDueDate(objective.getDueDate());
-            retrievedObjective.setDoneCriteria(objective.getDoneCriteria());
-            retrievedObjective.setName(objective.getName());
+
+            if (objective.getStatus() != null) retrievedObjective.setStatus(objective.getStatus());
+            if (objective.getDescription() != null) retrievedObjective.setDescription(objective.getDescription());
+            if (objective.getDueDate() != null) retrievedObjective.setDueDate(objective.getDueDate());
+            if (objective.getDoneCriteria() != null) retrievedObjective.setDoneCriteria(objective.getDoneCriteria());
+            if (objective.getName() != null) retrievedObjective.setName(objective.getName());
+
             objectiveRepository.save(retrievedObjective);
             return Optional.of(retrievedObjective);
         }

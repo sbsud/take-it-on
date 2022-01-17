@@ -19,6 +19,12 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Milestone {
+
+
+    @Transient
+    @JsonInclude
+    public boolean hasItems = true;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

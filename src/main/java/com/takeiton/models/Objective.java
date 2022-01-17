@@ -20,6 +20,11 @@ import java.util.List;
 @Builder
 public class Objective {
 
+
+    @Transient
+    @JsonInclude
+    public boolean hasItems = true;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -36,8 +41,6 @@ public class Objective {
     private String description;
 
     private String doneCriteria;
-
-    private Long parentId;
 
     @NotNull
     private Date dueDate;

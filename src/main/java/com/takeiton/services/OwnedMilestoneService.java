@@ -85,6 +85,9 @@ public class OwnedMilestoneService {
 
     private StatusAggregate getTaskStatusAggregate(Milestone milestone) {
         List<Task> tasks = milestone.getTasks();
+        if (tasks.isEmpty()) {
+            return null;
+        }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
         double inProgressCount = tasks.stream().filter(TASK_BY_INPROGRESS_STATUS).count();
         double notStartedCount = tasks.stream().filter(TASK_BY_NOTSTARTED_STATUS).count();
@@ -115,7 +118,38 @@ public class OwnedMilestoneService {
         }
         for (Milestone milestone : objMilestones) {
             updateAggregates(milestone);
+            if (milestone.getTaskStatusAggregates() == null) {
+                milestone.hasItems = false;
+            }
         }
         return objMilestones;
     }
+
+    public Optional<Milestone> save(Long milestoneId, Milestone milestone, String ownerName) {
+        if (milestone == null) {
+            throw new IllegalArgumentException("Invalid objective");
+        }
+        Optional<AppUser> optAppUser = appUserRepository.findById(ownerName);
+        AppUser appUser;
+        if (optAppUser.isPresent()) {
+            appUser = optAppUser.get();
+        } else {
+            throw new IllegalArgumentException("Invalid username");
+        }
+        Optional<Milestone> retrievedOptionalMilestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser);
+
+        if (retrievedOptionalMilestone.isPresent()) {
+            Milestone retrievedMilestone = retrievedOptionalMilestone.get();
+            if (milestone.getStatus() != null) retrievedMilestone.setStatus(milestone.getStatus());
+            if (milestone.getDescription() != null) retrievedMilestone.setDescription(milestone.getDescription());
+            if (milestone.getDueDate() != null) retrievedMilestone.setDueDate(milestone.getDueDate());
+            if (milestone.getDoneCriteria() != null) retrievedMilestone.setDoneCriteria(milestone.getDoneCriteria());
+            if (milestone.getName() != null) retrievedMilestone.setName(milestone.getName());
+
+            milestoneRepository.save(retrievedMilestone);
+            return Optional.of(retrievedMilestone);
+        }
+        return Optional.empty();
+    }
+
 }

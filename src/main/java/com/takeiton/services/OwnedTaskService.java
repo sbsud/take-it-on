@@ -103,10 +103,13 @@ public class OwnedTaskService {
 
         if (retrievedOptionalTask.isPresent()) {
             Task retrievedTask = retrievedOptionalTask.get();
-            retrievedTask.setStatus(task.getStatus());
-            retrievedTask.setDescription(task.getDescription());
-            retrievedTask.setDueDate(task.getDueDate());
-            retrievedTask.setDoneCriteria(task.getDoneCriteria());
+
+            if (task.getStatus() != null) retrievedTask.setStatus(task.getStatus());
+            if (task.getDescription() != null) retrievedTask.setDescription(task.getDescription());
+            if (task.getDueDate() != null) retrievedTask.setDueDate(task.getDueDate());
+            if (task.getDoneCriteria() != null) retrievedTask.setDoneCriteria(task.getDoneCriteria());
+            if (task.getName() != null) retrievedTask.setName(task.getName());
+
             taskRepository.save(retrievedTask);
             return Optional.of(retrievedTask);
         }

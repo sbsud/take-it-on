@@ -17,6 +17,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class Task {
+
+
+    @Transient
+    @JsonInclude
+    public boolean hasItems = false;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
