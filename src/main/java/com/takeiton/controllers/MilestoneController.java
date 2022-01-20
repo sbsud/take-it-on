@@ -2,6 +2,7 @@ package com.takeiton.controllers;
 
 import com.takeiton.models.Milestone;
 import com.takeiton.models.Objective;
+import com.takeiton.models.StatusRollup;
 import com.takeiton.services.OwnedMilestoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,11 @@ public class MilestoneController {
     @GetMapping(value = "/milestone")
     public Iterable<Milestone> getAllMilestones(Principal principal) {
         return milestoneService.findAll(principal.getName());
+    }
+
+    @GetMapping(value = "/milestone/statusRollup")
+    public StatusRollup getAllMilestonesStatusRollup(Principal principal) {
+        return milestoneService.findAllStatusRollup(principal.getName());
     }
 
     @GetMapping(value = "objective/{objectiveId}/milestone")

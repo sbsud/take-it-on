@@ -17,6 +17,11 @@ import java.util.function.Predicate;
 
 @Service
 public class OwnedMilestoneService {
+
+    public static final Predicate<Milestone> MILESTONE_BY_DONE_STATUS = milestone -> Status.COMPLETED.toString().equalsIgnoreCase(milestone.getStatus());
+    public static final Predicate<Milestone> MILESTONE_BY_INPROGRESS_STATUS = milestone -> Status.IN_PROGRESS.toString().equalsIgnoreCase(milestone.getStatus());
+    public static final Predicate<Milestone> MILESTONE_BY_NOTSTARTED_STATUS = milestone -> Status.NOT_STARTED.toString().equalsIgnoreCase(milestone.getStatus());
+
     public static final Predicate<Task> TASK_BY_DONE_STATUS = task -> Status.COMPLETED.toString().equalsIgnoreCase(task.getStatus());
     public static final Predicate<Task> TASK_BY_INPROGRESS_STATUS = task -> Status.IN_PROGRESS.toString().equalsIgnoreCase(task.getStatus());
     public static final Predicate<Task> TASK_BY_NOTSTARTED_STATUS = task -> Status.NOT_STARTED.toString().equalsIgnoreCase(task.getStatus());
@@ -152,4 +157,16 @@ public class OwnedMilestoneService {
         return Optional.empty();
     }
 
+    public StatusRollup findAllStatusRollup(String ownerName) {
+        AppUser appUser = appUserRepository.findById(ownerName).get();
+
+        List<Milestone> milestones = milestoneRepository.findAllByOwner(appUser);
+        StatusRollup statusRollup = StatusRollup.builder()
+                .inProgress(milestones.stream().filter(MILESTONE_BY_INPROGRESS_STATUS).count())
+                .notStarted(milestones.stream().filter(MILESTONE_BY_NOTSTARTED_STATUS).count())
+                .done(milestones.stream().filter(MILESTONE_BY_DONE_STATUS).count())
+                .build();
+
+        return statusRollup;
+    }
 }

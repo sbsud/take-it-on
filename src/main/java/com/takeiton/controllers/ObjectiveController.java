@@ -1,6 +1,7 @@
 package com.takeiton.controllers;
 
 import com.takeiton.models.Objective;
+import com.takeiton.models.StatusRollup;
 import com.takeiton.services.OwnedObjectiveService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,11 @@ public class ObjectiveController {
     @GetMapping
     public List<Objective> getAllObjectives(@RequestParam(required = false) boolean rollup, Principal principal) {
         return ownedObjectiveService.findAll(principal.getName(), rollup);
+    }
+
+    @GetMapping(value = "/statusRollup")
+    public StatusRollup getAllObjectivesStatusRollup(Principal principal) {
+        return ownedObjectiveService.findAllStatusRollup(principal.getName());
     }
 
     @GetMapping(value = "{objectiveId}")

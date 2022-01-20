@@ -1,5 +1,6 @@
 package com.takeiton.controllers;
 
+import com.takeiton.models.StatusRollup;
 import com.takeiton.models.Task;
 import com.takeiton.services.OwnedTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ public class TaskController {
     }
 
 
-
     @GetMapping(value = "/task/{taskId}")
     public ResponseEntity<Task> getObjective(@PathVariable(value = "taskId") Long taskId, Principal principal) {
         Optional<Task> task = taskService.findById(taskId, principal.getName());
@@ -47,8 +47,13 @@ public class TaskController {
         return taskService.findAllTasks(principal.getName());
     }
 
+    @GetMapping(value = "/task/statusRollup")
+    public StatusRollup getAllTasksStatusRollup(Principal principal) {
+        return taskService.findAllTasksStatusRollup(principal.getName());
+    }
+
     @PutMapping(value = "task/{taskId}")
-    public ResponseEntity<Task> updateTask(@PathVariable(value = "taskId") Long taskId, @RequestBody @Valid Task task, Principal principal){
+    public ResponseEntity<Task> updateTask(@PathVariable(value = "taskId") Long taskId, @RequestBody @Valid Task task, Principal principal) {
         Optional<Task> savedTask = taskService.save(taskId, task, principal.getName());
         return savedTask.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }

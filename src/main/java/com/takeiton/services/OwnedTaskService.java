@@ -1,9 +1,6 @@
 package com.takeiton.services;
 
-import com.takeiton.models.AppUser;
-import com.takeiton.models.Milestone;
-import com.takeiton.models.Objective;
-import com.takeiton.models.Task;
+import com.takeiton.models.*;
 import com.takeiton.repositories.MilestoneRepository;
 import com.takeiton.repositories.ObjectiveRepository;
 import com.takeiton.repositories.TaskRepository;
@@ -14,9 +11,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 public class OwnedTaskService {
+
+    public static final Predicate<Task> TASK_BY_DONE_STATUS = task -> Status.COMPLETED.toString().equalsIgnoreCase(task.getStatus());
+    public static final Predicate<Task> TASK_BY_INPROGRESS_STATUS = task -> Status.IN_PROGRESS.toString().equalsIgnoreCase(task.getStatus());
+    public static final Predicate<Task> TASK_BY_NOTSTARTED_STATUS = task -> Status.NOT_STARTED.toString().equalsIgnoreCase(task.getStatus());
 
     @Autowired
     ObjectiveRepository objectiveRepository;
@@ -138,4 +140,16 @@ public class OwnedTaskService {
         return Optional.of(tasks);
     }
 
+    public StatusRollup findAllTasksStatusRollup(String ownerName) {
+        AppUser appUser = userService.getAppUserForName(ownerName);
+
+        List<Task> tasks = taskRepository.findAllByOwner(appUser);
+        StatusRollup statusRollup = StatusRollup.builder()
+                .inProgress(tasks.stream().filter(TASK_BY_INPROGRESS_STATUS).count())
+                .notStarted(tasks.stream().filter(TASK_BY_NOTSTARTED_STATUS).count())
+                .done(tasks.stream().filter(TASK_BY_DONE_STATUS).count())
+                .build();
+
+        return statusRollup;
+    }
 }

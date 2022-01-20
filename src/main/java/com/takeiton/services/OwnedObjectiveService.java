@@ -19,6 +19,10 @@ public class OwnedObjectiveService {
     public static final Predicate<Milestone> MILESTONE_BY_INPROGRESS_STATUS = milestone -> Status.IN_PROGRESS.toString().equalsIgnoreCase(milestone.getStatus());
     public static final Predicate<Milestone> MILESTONE_BY_NOTSTARTED_STATUS = milestone -> Status.NOT_STARTED.toString().equalsIgnoreCase(milestone.getStatus());
 
+    public static final Predicate<Objective> OBJECTIVE_BY_DONE_STATUS = objective -> Status.COMPLETED.toString().equalsIgnoreCase(objective.getStatus());
+    public static final Predicate<Objective> OBJECTIVE_BY_INPROGRESS_STATUS = objective -> Status.IN_PROGRESS.toString().equalsIgnoreCase(objective.getStatus());
+    public static final Predicate<Objective> OBJECTIVE_BY_NOTSTARTED_STATUS = objective -> Status.NOT_STARTED.toString().equalsIgnoreCase(objective.getStatus());
+
     public static final Predicate<Task> TASK_BY_DONE_STATUS = task -> Status.COMPLETED.toString().equalsIgnoreCase(task.getStatus());
     public static final Predicate<Task> TASK_BY_INPROGRESS_STATUS = task -> Status.IN_PROGRESS.toString().equalsIgnoreCase(task.getStatus());
     public static final Predicate<Task> TASK_BY_NOTSTARTED_STATUS = task -> Status.NOT_STARTED.toString().equalsIgnoreCase(task.getStatus());
@@ -148,5 +152,18 @@ public class OwnedObjectiveService {
             return Optional.of(retrievedObjective);
         }
         return Optional.empty();
+    }
+
+    public StatusRollup findAllStatusRollup(String ownerName) {
+        AppUser appUser = appUserRepository.findById(ownerName).get();
+
+        List<Objective> objectives = objectiveRepository.findAllByOwner(appUser);
+        StatusRollup statusRollup = StatusRollup.builder()
+                .inProgress(objectives.stream().filter(OBJECTIVE_BY_INPROGRESS_STATUS).count())
+                .notStarted(objectives.stream().filter(OBJECTIVE_BY_NOTSTARTED_STATUS).count())
+                .done(objectives.stream().filter(OBJECTIVE_BY_DONE_STATUS).count())
+                .build();
+
+        return statusRollup;
     }
 }
