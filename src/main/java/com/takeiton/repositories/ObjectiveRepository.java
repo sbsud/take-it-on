@@ -13,4 +13,6 @@ public interface ObjectiveRepository extends CrudRepository<Objective, Long> {
     List<Objective> findAllByOwner(AppUser owner);
 
     Optional<Objective> findByIdAndOwner(long id, AppUser owner);
+
+    List<Objective> findAllByOwnerAndStatus(AppUser owner, String status);
 }

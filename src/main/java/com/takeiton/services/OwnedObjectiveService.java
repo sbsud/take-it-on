@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -50,6 +51,23 @@ public class OwnedObjectiveService {
         objective =objectiveRepository.save(objective);
         objective.setClientId(Objective.class.getSimpleName()+"_"+objective.getId());
         return objectiveRepository.save(objective);
+    }
+
+    public List<Objective> findAllByStatus(String ownerName, boolean rollup, String status) {
+        AppUser appUser = appUserRepository.findById(ownerName).get();
+        List<Objective> objectiveList;
+        if(status == null) {
+            objectiveList = objectiveRepository.findAllByOwner(appUser);
+        } else {
+            objectiveList = objectiveRepository.findAllByOwnerAndStatus(appUser, status.toUpperCase(Locale.ROOT));
+        }
+        for (Objective objective : objectiveList) {
+            updateAggregates(objective);
+            if (objective.getMilestoneStatusAggregates() ==  null && objective.getTaskStatusAggregates() == null) {
+                objective.hasItems = false;
+            }
+        }
+        return objectiveList;
     }
 
     public List<Objective> findAll(String ownerName, boolean rollup) {

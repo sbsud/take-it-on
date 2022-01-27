@@ -1,6 +1,5 @@
 package com.takeiton.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.takeiton.models.AppUser;
 import com.takeiton.models.Objective;

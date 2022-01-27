@@ -20,8 +20,8 @@ public class ObjectiveController {
     OwnedObjectiveService ownedObjectiveService;
 
     @GetMapping
-    public List<Objective> getAllObjectives(@RequestParam(required = false) boolean rollup, Principal principal) {
-        return ownedObjectiveService.findAll(principal.getName(), rollup);
+    public List<Objective> getAllObjectives(@RequestParam(required = false) boolean rollup, @RequestParam(required = false) String status, Principal principal) {
+        return ownedObjectiveService.findAllByStatus(principal.getName(), rollup, status);
     }
 
     @GetMapping(value = "/statusRollup")
