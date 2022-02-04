@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -68,6 +69,23 @@ public class OwnedMilestoneService {
         List<Milestone> milestoneList = milestoneRepository.findAllByOwner(appUser);
         for (Milestone milestone : milestoneList) {
             updateAggregates(milestone);
+        }
+        return milestoneList;
+    }
+
+    public List<Milestone> findAllByStatus(String ownerName, String status) {
+        AppUser appUser = appUserRepository.findById(ownerName).get();
+        List<Milestone> milestoneList;
+        if(status == null) {
+            milestoneList = milestoneRepository.findAllByOwner(appUser);
+        } else {
+            milestoneList = milestoneRepository.findAllByOwnerAndStatus(appUser, status.toUpperCase(Locale.ROOT));
+        }
+        for (Milestone milestone : milestoneList) {
+            updateAggregates(milestone);
+            if (milestone.getTaskStatusAggregates() == null) {
+                milestone.hasItems = false;
+            }
         }
         return milestoneList;
     }

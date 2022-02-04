@@ -47,5 +47,7 @@ public class Task {
     @JsonIgnore
     private AppUser owner;
 
+    private String category;
+
     private String status;
 }

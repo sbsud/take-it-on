@@ -1,6 +1,7 @@
 package com.takeiton.services;
 
 import com.takeiton.models.*;
+import com.takeiton.repositories.HistoryRepository;
 import com.takeiton.repositories.MilestoneRepository;
 import com.takeiton.repositories.ObjectiveRepository;
 import com.takeiton.repositories.TaskRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -32,6 +34,9 @@ public class OwnedTaskService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    HistoryRepository historyRepository;
+
 
     public Task createTaskForObjective(Long objectiveId, Task task, String ownerName) {
         if (task == null) {
@@ -50,6 +55,19 @@ public class OwnedTaskService {
         taskList.add(createdTask);
         objective.setTasks(taskList);
         objectiveRepository.save(objective);
+        History historyEntry = History.builder()
+                .entityId(createdTask.getId())
+                .entityType(Task.class.getSimpleName())
+                .category(createdTask.getCategory())
+                .owner(createdTask.getOwner().getUsername())
+                .time(new Date())
+                .dueDate(createdTask.getDueDate())
+                .event(HistoryEvents.CREATE.name())
+                .build();
+        historyRepository.save(historyEntry);
+        historyEntry.setEvent(HistoryEvents.STATUS_CHANGE.name());
+        historyEntry.setValue(createdTask.getStatus());
+        historyRepository.save(historyEntry);
         return createdTask;
     }
 
@@ -71,6 +89,19 @@ public class OwnedTaskService {
         taskList.add(createdTask);
         milestone.setTasks(taskList);
         milestoneRepository.save(milestone);
+        History historyEntry = History.builder()
+                .entityId(createdTask.getId())
+                .entityType(Task.class.getSimpleName())
+                .category(createdTask.getCategory())
+                .owner(createdTask.getOwner().getUsername())
+                .time(new Date())
+                .dueDate(createdTask.getDueDate())
+                .event(HistoryEvents.CREATE.name())
+                .build();
+        historyRepository.save(historyEntry);
+        historyEntry.setEvent(HistoryEvents.STATUS_CHANGE.name());
+        historyEntry.setValue(createdTask.getStatus());
+        historyRepository.save(historyEntry);
         return createdTask;
     }
 
@@ -105,14 +136,34 @@ public class OwnedTaskService {
 
         if (retrievedOptionalTask.isPresent()) {
             Task retrievedTask = retrievedOptionalTask.get();
-
-            if (task.getStatus() != null) retrievedTask.setStatus(task.getStatus());
+            boolean statusUpdate = false;
+            if (task.getStatus() != null) {
+                retrievedTask.setStatus(task.getStatus());
+                statusUpdate = true;
+            }
             if (task.getDescription() != null) retrievedTask.setDescription(task.getDescription());
             if (task.getDueDate() != null) retrievedTask.setDueDate(task.getDueDate());
             if (task.getDoneCriteria() != null) retrievedTask.setDoneCriteria(task.getDoneCriteria());
             if (task.getName() != null) retrievedTask.setName(task.getName());
+            if (task.getCategory() != null) retrievedTask.setCategory(task.getCategory());
 
             taskRepository.save(retrievedTask);
+            History historyEntry = History.builder()
+                    .entityId(retrievedTask.getId())
+                    .entityType(Task.class.getSimpleName())
+                    .category(retrievedTask.getCategory())
+                    .owner(retrievedTask.getOwner().getUsername())
+                    .time(new Date())
+                    .dueDate(retrievedTask.getDueDate())
+                    .event(HistoryEvents.UPDATE.name())
+                    .build();
+            historyRepository.save(historyEntry);
+            if(statusUpdate) {
+                historyEntry.setEvent(HistoryEvents.STATUS_CHANGE.name());
+                historyEntry.setValue(retrievedTask.getStatus());
+                historyRepository.save(historyEntry);
+            }
+
             return Optional.of(retrievedTask);
         }
         return Optional.empty();

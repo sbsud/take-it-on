@@ -42,6 +42,8 @@ public class Objective {
 
     private String doneCriteria;
 
+    private String category;
+
     @NotNull
     private Date dueDate;
 

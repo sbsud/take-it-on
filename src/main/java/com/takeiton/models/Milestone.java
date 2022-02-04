@@ -35,6 +35,8 @@ public class Milestone {
 
     private String clientId;
 
+    private String category;
+
     private String name;
 
     private String description;

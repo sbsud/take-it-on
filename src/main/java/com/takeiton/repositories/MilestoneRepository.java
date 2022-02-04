@@ -13,5 +13,6 @@ public interface MilestoneRepository extends CrudRepository<Milestone, Long> {
     Optional<Milestone> findByIdAndOwner(long id, AppUser owner);
 
     List<Milestone> findAllByOwner(AppUser owner);
+    List<Milestone> findAllByOwnerAndStatus(AppUser owner, String status);
 
 }
