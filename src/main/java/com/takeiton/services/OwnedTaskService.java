@@ -158,7 +158,7 @@ public class OwnedTaskService {
                     .event(HistoryEvents.UPDATE.name())
                     .build();
             historyRepository.save(historyEntry);
-            if(statusUpdate) {
+            if (statusUpdate) {
                 historyEntry.setEvent(HistoryEvents.STATUS_CHANGE.name());
                 historyEntry.setValue(retrievedTask.getStatus());
                 historyRepository.save(historyEntry);
@@ -169,12 +169,19 @@ public class OwnedTaskService {
         return Optional.empty();
     }
 
-    public Iterable<Task> findAllTasks(String ownerName) {
+    public Iterable<Task> findAllTasks(String ownerName, String status, String category) {
         AppUser appUser = userService.getAppUserForName(ownerName);
         if (appUser == null) {
             throw new AccessDeniedException("Invalid user");
         }
-        return taskRepository.findAllByOwner(appUser);
+        if (status == null && category == null) {
+            return taskRepository.findAllByOwner(appUser);
+        } else if (status != null && category == null) {
+            return taskRepository.findAllByOwnerAndStatus(appUser, status);
+        } else if (status == null && category != null) {
+            return taskRepository.findAllByOwnerAndCategory(appUser, category);
+        }
+        return taskRepository.findAllByOwnerAndStatusAndCategory(appUser, status, category);
     }
 
     public Optional<List<Task>> findTasksForMilestone(Long milestoneId, String ownerName) {

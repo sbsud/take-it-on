@@ -3,6 +3,7 @@ package com.takeiton.repositories;
 
 import com.takeiton.models.History;
 import com.takeiton.models.ICategoryCount;
+import com.takeiton.models.ICompletionRate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,5 +24,9 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
             "where h.owner =:owner AND h.dueDate < CURRENT_DATE+7 " +
             "GROUP BY h.category ORDER BY COUNT(h.category) ASC")
     List<ICategoryCount> findAllOverDue(@Param("owner") String owner);
+
+    @Query(value="Select to_char(h.time, 'DD-Mon') as day,count(to_char(h.time, 'DD-Mon')) as count from History h " +
+            "where h.owner =:owner AND h.event = 'STATUS_CHANGE' AND h.value = 'COMPLETED' " +
+            "GROUP BY to_char(h.time, 'DD-Mon') ORDER BY to_char(h.time, 'DD-Mon') ASC")
+    List<ICompletionRate> findCompletionRate(@Param("owner")String owner);
 }
-//select h.category as category, COUNT(h.category) as count FROM com.takeiton.models.History h where h.owner =:owner AND (h.dueDate < :date OR (h.dueDate - :date < 7) GROUP BY h.category ORDER BY COUNT(h.category) ASC

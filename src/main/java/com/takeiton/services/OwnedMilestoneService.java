@@ -168,7 +168,7 @@ public class OwnedMilestoneService {
             if (milestone.getDueDate() != null) retrievedMilestone.setDueDate(milestone.getDueDate());
             if (milestone.getDoneCriteria() != null) retrievedMilestone.setDoneCriteria(milestone.getDoneCriteria());
             if (milestone.getName() != null) retrievedMilestone.setName(milestone.getName());
-
+            if (milestone.getCategory() != null) retrievedMilestone.setCategory(milestone.getCategory());
             milestoneRepository.save(retrievedMilestone);
             return Optional.of(retrievedMilestone);
         }

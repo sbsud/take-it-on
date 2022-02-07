@@ -15,4 +15,9 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 
     List<Task> findAllByOwner(AppUser owner);
 
+    List<Task> findAllByOwnerAndStatus(AppUser owner, String status);
+
+    List<Task> findAllByOwnerAndCategory(AppUser owner, String category);
+
+    List<Task> findAllByOwnerAndStatusAndCategory(AppUser owner, String status, String category);
 }

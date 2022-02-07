@@ -43,8 +43,9 @@ public class TaskController {
     }
 
     @GetMapping(value = "/task")
-    public Iterable<Task> getAllTasks(Principal principal) {
-        return taskService.findAllTasks(principal.getName());
+    public Iterable<Task> getAllTasks(Principal principal, @RequestParam(required = false) String status, @RequestParam(required = false) String category) {
+
+        return taskService.findAllTasks(principal.getName(), status, category);
     }
 
     @GetMapping(value = "/task/statusRollup")

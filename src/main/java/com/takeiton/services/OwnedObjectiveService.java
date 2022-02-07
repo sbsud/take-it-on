@@ -165,7 +165,7 @@ public class OwnedObjectiveService {
             if (objective.getDueDate() != null) retrievedObjective.setDueDate(objective.getDueDate());
             if (objective.getDoneCriteria() != null) retrievedObjective.setDoneCriteria(objective.getDoneCriteria());
             if (objective.getName() != null) retrievedObjective.setName(objective.getName());
-
+            if (objective.getCategory() != null) retrievedObjective.setCategory(objective.getCategory());
             objectiveRepository.save(retrievedObjective);
             return Optional.of(retrievedObjective);
         }
