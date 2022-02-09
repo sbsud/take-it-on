@@ -23,7 +23,7 @@ public class History {
 
     private String entityType;
 
-    private Long entityId;
+    private String entityId;
 
     private String category;
 

@@ -48,7 +48,8 @@ public class OwnedTaskService {
         }
         Objective objective = objectiveRepository.findByIdAndOwner(objectiveId, appUser).get();
         task.setParentId(objective.getClientId());
-        task.setParentObjectiveId(objective.getId());
+//        task.setParentObjectiveId(objective.getId());
+        task.setParentObjective(objective);
         Task createdTask = createTaskWithProperties(task, appUser);
         createdTask.setClientId(objective.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
         createdTask = createTaskWithProperties(createdTask, appUser);
@@ -57,7 +58,7 @@ public class OwnedTaskService {
         objective.setTasks(taskList);
         objectiveRepository.save(objective);
         History historyEntry = History.builder()
-                .entityId(createdTask.getId())
+                .entityId(Long.toString(createdTask.getId()))
                 .entityType(Task.class.getSimpleName())
                 .category(createdTask.getCategory())
                 .owner(createdTask.getOwner().getUsername())
@@ -83,8 +84,9 @@ public class OwnedTaskService {
 
         Milestone milestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser).get();
         task.setParentId(milestone.getClientId());
-        task.setParentMilestoneId(milestone.getId());
-        task.setParentObjectiveId(milestone.getParentObjectiveId());
+//        task.setParentMilestoneId(milestone.getId());
+//        task.setParentObjectiveId(milestone.getParentObjectiveId());
+        task.setParentMilestone(milestone);
         Task createdTask = createTaskWithProperties(task, appUser);
         createdTask.setClientId(milestone.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
         createdTask = createTaskWithProperties(createdTask, appUser);
@@ -93,7 +95,7 @@ public class OwnedTaskService {
         milestone.setTasks(taskList);
         milestoneRepository.save(milestone);
         History historyEntry = History.builder()
-                .entityId(createdTask.getId())
+                .entityId(Long.toString(createdTask.getId()))
                 .entityType(Task.class.getSimpleName())
                 .category(createdTask.getCategory())
                 .owner(createdTask.getOwner().getUsername())
@@ -152,7 +154,7 @@ public class OwnedTaskService {
 
             taskRepository.save(retrievedTask);
             History historyEntry = History.builder()
-                    .entityId(retrievedTask.getId())
+                    .entityId(Long.toString(retrievedTask.getId()))
                     .entityType(Task.class.getSimpleName())
                     .category(retrievedTask.getCategory())
                     .owner(retrievedTask.getOwner().getUsername())

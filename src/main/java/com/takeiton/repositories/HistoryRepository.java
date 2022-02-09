@@ -4,6 +4,7 @@ package com.takeiton.repositories;
 import com.takeiton.models.History;
 import com.takeiton.models.ICategoryCount;
 import com.takeiton.models.ICompletionRate;
+import com.takeiton.models.IHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +30,8 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
             "where h.owner =:owner AND h.event = 'STATUS_CHANGE' AND h.value = 'COMPLETED' " +
             "GROUP BY to_char(h.time, 'DD-Mon') ORDER BY to_char(h.time, 'DD-Mon') ASC")
     List<ICompletionRate> findCompletionRate(@Param("owner")String owner);
+
+    @Query(value="select h.time as time, h.event as event, h.value as value from History h where h.owner=:owner and h.entityId=:entityId " +
+            "ORDER BY h.time ASC")
+    List<IHistory> findAllByOwnerAndEntityId(@Param("owner")String owner, @Param("entityId")String entityId);
 }

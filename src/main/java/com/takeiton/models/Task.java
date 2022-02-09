@@ -41,9 +41,9 @@ public class Task {
 
     private String parentId;
 
-    private Long parentMilestoneId;
-
-    private Long parentObjectiveId;
+//    private Long parentMilestoneId;
+//
+//    private Long parentObjectiveId;
 
     private String clientId;
     private String parentType;
@@ -51,6 +51,14 @@ public class Task {
     @NotNull
     @JsonIgnore
     private AppUser owner;
+
+    @OneToOne
+    @NotNull
+    private Milestone parentMilestone;
+
+    @OneToOne
+    @NotNull
+    private Objective parentObjective;
 
     private String category;
 
