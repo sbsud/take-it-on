@@ -54,6 +54,8 @@ public class Milestone {
     @JsonIgnore
     private AppUser owner;
 
+    private Long parentObjectiveId;
+
     @OneToMany
     @JsonIgnore
     @Builder.Default

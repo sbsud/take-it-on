@@ -48,6 +48,7 @@ public class OwnedTaskService {
         }
         Objective objective = objectiveRepository.findByIdAndOwner(objectiveId, appUser).get();
         task.setParentId(objective.getClientId());
+        task.setParentObjectiveId(objective.getId());
         Task createdTask = createTaskWithProperties(task, appUser);
         createdTask.setClientId(objective.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
         createdTask = createTaskWithProperties(createdTask, appUser);
@@ -82,6 +83,8 @@ public class OwnedTaskService {
 
         Milestone milestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser).get();
         task.setParentId(milestone.getClientId());
+        task.setParentMilestoneId(milestone.getId());
+        task.setParentObjectiveId(milestone.getParentObjectiveId());
         Task createdTask = createTaskWithProperties(task, appUser);
         createdTask.setClientId(milestone.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
         createdTask = createTaskWithProperties(createdTask, appUser);

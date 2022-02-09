@@ -40,6 +40,11 @@ public class Task {
     private Date dueDate;
 
     private String parentId;
+
+    private Long parentMilestoneId;
+
+    private Long parentObjectiveId;
+
     private String clientId;
     private String parentType;
     @OneToOne
