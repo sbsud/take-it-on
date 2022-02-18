@@ -51,6 +51,7 @@ public class OwnedMilestoneService {
         milestone.setParentId(objective.getClientId());
 //        milestone.setParentObjectiveId(objectiveId);
         milestone.setParentObjective(objective);
+        milestone.setCategory(objective.getCategory());
         Milestone createdMilestone = milestoneRepository.save(milestone);
 
         List<Milestone> objMilestones = objective.getMilestones();

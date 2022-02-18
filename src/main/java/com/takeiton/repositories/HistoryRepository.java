@@ -32,6 +32,6 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
     List<ICompletionRate> findCompletionRate(@Param("owner")String owner);
 
     @Query(value="select h.time as time, h.event as event, h.value as value from History h where h.owner=:owner and h.entityId=:entityId " +
-            "ORDER BY h.time ASC")
+            "ORDER BY h.time DESC")
     List<IHistory> findAllByOwnerAndEntityId(@Param("owner")String owner, @Param("entityId")String entityId);
 }

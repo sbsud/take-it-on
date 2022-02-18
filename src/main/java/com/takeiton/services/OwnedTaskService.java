@@ -151,6 +151,8 @@ public class OwnedTaskService {
             if (task.getDoneCriteria() != null) retrievedTask.setDoneCriteria(task.getDoneCriteria());
             if (task.getName() != null) retrievedTask.setName(task.getName());
             if (task.getCategory() != null) retrievedTask.setCategory(task.getCategory());
+            if (task.getEffortLogged() != null) retrievedTask.setEffortLogged(retrievedTask.getEffortLogged() + task.getEffortLogged());
+
 
             taskRepository.save(retrievedTask);
             History historyEntry = History.builder()
@@ -200,6 +202,20 @@ public class OwnedTaskService {
         }
         Milestone milestone = optionalMilestone.get();
         List<Task> tasks = milestone.getTasks();
+        return Optional.of(tasks);
+    }
+
+    public Optional<List<Task>> findTasksForObjective(Long objectiveId, String ownerName) {
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        if (appUser == null) {
+            throw new AccessDeniedException("Invalid user");
+        }
+        Optional<Objective> optionalObjective = objectiveRepository.findByIdAndOwner(objectiveId, appUser);
+        if (optionalObjective.isEmpty()) {
+            return Optional.empty();
+        }
+        Objective objective = optionalObjective.get();
+        List<Task> tasks = objective.getTasks();
         return Optional.of(tasks);
     }
 

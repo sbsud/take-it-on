@@ -35,6 +35,12 @@ public class TaskController {
         return optionalTasks.map(tasks -> ResponseEntity.ok().body(tasks)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping(value = "objective/{objectiveId}/task")
+    public ResponseEntity<List<Task>> findTasksForObjective(@PathVariable(value = "objectiveId") Long objectiveId, Principal principal) {
+        Optional<List<Task>> optionalTasks = taskService.findTasksForObjective(objectiveId, principal.getName());
+        return optionalTasks.map(tasks -> ResponseEntity.ok().body(tasks)).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 
     @GetMapping(value = "/task/{taskId}")
     public ResponseEntity<Task> getObjective(@PathVariable(value = "taskId") Long taskId, Principal principal) {

@@ -41,10 +41,6 @@ public class Task {
 
     private String parentId;
 
-//    private Long parentMilestoneId;
-//
-//    private Long parentObjectiveId;
-
     private String clientId;
     private String parentType;
     @OneToOne
@@ -61,6 +57,10 @@ public class Task {
     private Objective parentObjective;
 
     private String category;
+
+    private Integer plannedEffort;
+
+    private Integer effortLogged = 0;
 
     private String status;
 }
