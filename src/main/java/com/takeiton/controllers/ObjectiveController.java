@@ -20,8 +20,8 @@ public class ObjectiveController {
     OwnedObjectiveService ownedObjectiveService;
 
     @GetMapping
-    public List<Objective> getAllObjectives(@RequestParam(required = false) boolean rollup, @RequestParam(required = false) String status, Principal principal) {
-        return ownedObjectiveService.findAllByStatus(principal.getName(), rollup, status);
+    public List<Objective> getAllObjectives(@RequestParam(required = false) boolean rollup, @RequestParam(required = false) String status, @RequestParam(required = false) String filter, Principal principal) {
+        return ownedObjectiveService.findAllByStatus(principal.getName(), rollup, status, filter);
     }
 
     @GetMapping(value = "/statusRollup")
@@ -41,7 +41,7 @@ public class ObjectiveController {
     }
 
     @PutMapping(value = "{objectiveId}")
-    public ResponseEntity<Objective> updateObjective(@PathVariable(value = "objectiveId") Long objectiveId, @RequestBody @Valid Objective objective, Principal principal){
+    public ResponseEntity<Objective> updateObjective(@PathVariable(value = "objectiveId") Long objectiveId, @RequestBody @Valid Objective objective, Principal principal) {
         Optional<Objective> savedObjective = ownedObjectiveService.save(objectiveId, objective, principal.getName());
         return savedObjective.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
     }

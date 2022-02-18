@@ -76,11 +76,15 @@ public class OwnedMilestoneService {
         return milestoneList;
     }
 
-    public List<Milestone> findAllByStatus(String ownerName, String status) {
+    public List<Milestone> findAllByStatus(String ownerName, String status, String filter) {
         AppUser appUser = appUserRepository.findById(ownerName).get();
-        List<Milestone> milestoneList;
+        List<Milestone> milestoneList = new ArrayList<Milestone>();
         if(status == null) {
-            milestoneList = milestoneRepository.findAllByOwner(appUser);
+            if (filter == null) {
+                milestoneList = milestoneRepository.findAllByOwner(appUser);
+            } else if (filter != null) {
+                milestoneList = milestoneRepository.findAllByOwnerAndNameLike(appUser, '%' + filter + '%');
+            }
         } else {
             milestoneList = milestoneRepository.findAllByOwnerAndStatus(appUser, status.toUpperCase(Locale.ROOT));
         }

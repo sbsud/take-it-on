@@ -8,6 +8,7 @@ import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -48,22 +49,28 @@ public class OwnedObjectiveService {
 
         objective.setOwner(appUser);
         objective.setStatus(Status.NOT_STARTED.toString());
-        objective =objectiveRepository.save(objective);
-        objective.setClientId(Objective.class.getSimpleName()+"_"+objective.getId());
+        objective = objectiveRepository.save(objective);
+        objective.setClientId(Objective.class.getSimpleName() + "_" + objective.getId());
         return objectiveRepository.save(objective);
     }
 
-    public List<Objective> findAllByStatus(String ownerName, boolean rollup, String status) {
+    public List<Objective> findAllByStatus(String ownerName, boolean rollup, String status, String filter) {
         AppUser appUser = appUserRepository.findById(ownerName).get();
-        List<Objective> objectiveList;
-        if(status == null) {
-            objectiveList = objectiveRepository.findAllByOwner(appUser);
+        List<Objective> objectiveList = new ArrayList<Objective>();
+        System.out.println(status);
+        System.out.println(filter);
+        if (status == null) {
+            if (filter == null) {
+                objectiveList = objectiveRepository.findAllByOwner(appUser);
+            } else if (filter != null) {
+                objectiveList = objectiveRepository.findAllByOwnerAndNameLike(appUser, '%' + filter + '%');
+            }
         } else {
             objectiveList = objectiveRepository.findAllByOwnerAndStatus(appUser, status.toUpperCase(Locale.ROOT));
         }
         for (Objective objective : objectiveList) {
             updateAggregates(objective);
-            if (objective.getMilestoneStatusAggregates() ==  null && objective.getTaskStatusAggregates() == null) {
+            if (objective.getMilestoneStatusAggregates() == null && objective.getTaskStatusAggregates() == null) {
                 objective.hasItems = false;
             }
         }
@@ -76,7 +83,7 @@ public class OwnedObjectiveService {
         List<Objective> objectiveList = objectiveRepository.findAllByOwner(appUser);
         for (Objective objective : objectiveList) {
             updateAggregates(objective);
-            if (objective.getMilestoneStatusAggregates() ==  null && objective.getTaskStatusAggregates() == null) {
+            if (objective.getMilestoneStatusAggregates() == null && objective.getTaskStatusAggregates() == null) {
                 objective.hasItems = false;
             }
         }
@@ -96,7 +103,7 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getMilestoneStatusAggregate(Objective objective) {
         List<Milestone> milestones = objective.getMilestones();
-        if(milestones.isEmpty()) {
+        if (milestones.isEmpty()) {
             return null;
         }
         double doneCount = milestones.stream().filter(MILESTONE_BY_DONE_STATUS).count();
@@ -124,7 +131,7 @@ public class OwnedObjectiveService {
 
     private StatusAggregate getTaskStatusAggregate(Objective objective) {
         List<Task> tasks = objective.getTasks();
-        if(tasks.isEmpty()) {
+        if (tasks.isEmpty()) {
             return null;
         }
         double doneCount = tasks.stream().filter(TASK_BY_DONE_STATUS).count();
@@ -132,7 +139,7 @@ public class OwnedObjectiveService {
         double notStartedCount = tasks.stream().filter(TASK_BY_NOTSTARTED_STATUS).count();
         long size = tasks.size();
         StatusAggregate statusAggregate = StatusAggregate.builder().build();
-        if (size > 0 ) {
+        if (size > 0) {
             double doneAggregate = doneCount / size;
             double inProgressAggregate = inProgressCount / size;
             double notStartedAggregate = notStartedCount / size;

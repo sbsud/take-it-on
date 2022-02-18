@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface ObjectiveRepository extends CrudRepository<Objective, Long> {
     List<Objective> findAllByOwner(AppUser owner);
 
+    List<Objective> findAllByOwnerAndNameLike(AppUser owner, String name);
+
     Optional<Objective> findByIdAndOwner(long id, AppUser owner);
 
     List<Objective> findAllByOwnerAndStatus(AppUser owner, String status);

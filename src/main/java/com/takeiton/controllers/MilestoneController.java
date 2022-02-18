@@ -37,8 +37,8 @@ public class MilestoneController {
     }
 
     @GetMapping(value = "/milestone")
-    public Iterable<Milestone> getAllMilestones(@RequestParam(required = false) String status, Principal principal) {
-        return milestoneService.findAllByStatus(principal.getName(), status);
+    public Iterable<Milestone> getAllMilestones(@RequestParam(required = false) String status, @RequestParam(required = false) String filter, Principal principal) {
+        return milestoneService.findAllByStatus(principal.getName(), status, filter);
     }
 
     @GetMapping(value = "/milestone/statusRollup")
