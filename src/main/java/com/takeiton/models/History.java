@@ -35,5 +35,4 @@ public class History {
 
     private String owner;
 
-    private Date dueDate;
 }

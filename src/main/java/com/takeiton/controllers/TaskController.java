@@ -54,6 +54,12 @@ public class TaskController {
         return taskService.findAllTasks(principal.getName(), status, category);
     }
 
+    @GetMapping(value = "/task/overdue")
+    public Iterable<Task> getAllOverdueTasks(Principal principal, @RequestParam(required = false) String category) {
+
+        return taskService.findAllOverdueTasks(principal.getName(), category);
+    }
+
     @GetMapping(value = "/task/statusRollup")
     public StatusRollup getAllTasksStatusRollup(Principal principal) {
         return taskService.findAllTasksStatusRollup(principal.getName());

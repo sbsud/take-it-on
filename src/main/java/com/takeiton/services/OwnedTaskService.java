@@ -48,7 +48,6 @@ public class OwnedTaskService {
         }
         Objective objective = objectiveRepository.findByIdAndOwner(objectiveId, appUser).get();
         task.setParentId(objective.getClientId());
-//        task.setParentObjectiveId(objective.getId());
         task.setParentObjective(objective);
         Task createdTask = createTaskWithProperties(task, appUser);
         createdTask.setClientId(objective.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
@@ -63,7 +62,6 @@ public class OwnedTaskService {
                 .category(createdTask.getCategory())
                 .owner(createdTask.getOwner().getUsername())
                 .time(new Date())
-                .dueDate(createdTask.getDueDate())
                 .event(HistoryEvents.CREATE.name())
                 .build();
         historyRepository.save(historyEntry);
@@ -84,8 +82,7 @@ public class OwnedTaskService {
 
         Milestone milestone = milestoneRepository.findByIdAndOwner(milestoneId, appUser).get();
         task.setParentId(milestone.getClientId());
-//        task.setParentMilestoneId(milestone.getId());
-//        task.setParentObjectiveId(milestone.getParentObjectiveId());
+
         task.setParentMilestone(milestone);
         Task createdTask = createTaskWithProperties(task, appUser);
         createdTask.setClientId(milestone.getClientId() + "\\" + Task.class.getSimpleName() + "_" + createdTask.getId());
@@ -100,7 +97,6 @@ public class OwnedTaskService {
                 .category(createdTask.getCategory())
                 .owner(createdTask.getOwner().getUsername())
                 .time(new Date())
-                .dueDate(createdTask.getDueDate())
                 .event(HistoryEvents.CREATE.name())
                 .build();
         historyRepository.save(historyEntry);
@@ -161,7 +157,6 @@ public class OwnedTaskService {
                     .category(retrievedTask.getCategory())
                     .owner(retrievedTask.getOwner().getUsername())
                     .time(new Date())
-                    .dueDate(retrievedTask.getDueDate())
                     .event(HistoryEvents.UPDATE.name())
                     .build();
             historyRepository.save(historyEntry);
@@ -190,6 +185,12 @@ public class OwnedTaskService {
         }
         return taskRepository.findAllByOwnerAndStatusAndCategory(appUser, status, category);
     }
+
+    public Iterable<Task> findAllOverdueTasks(String ownerName, String category) {
+        AppUser appUser = userService.getAppUserForName(ownerName);
+        return taskRepository.findAllOverDueTasksByCategory(appUser, category);
+    }
+
 
     public Optional<List<Task>> findTasksForMilestone(Long milestoneId, String ownerName) {
         AppUser appUser = userService.getAppUserForName(ownerName);
